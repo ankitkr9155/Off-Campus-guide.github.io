@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultimate Off-Campus SDE Tracker</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #0f172a;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1250px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 25px 35px;
+            border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        
+        h1 { margin: 0; color: #0f172a; font-size: 28px; font-weight: 700; }
+        p { margin: 8px 0 0 0; color: #64748b; font-size: 15px; }
+        
+        .search-container {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        #searchInput {
+            width: 100%;
+            max-width: 450px;
+            padding: 12px 18px;
+            font-size: 14px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        
+        #searchInput:focus { 
+            border-color: #2563eb; 
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+        
+        .table-wrapper {
+            overflow-x: auto;
+            height: 65vh;
+            overflow-y: auto;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13.5px;
+            text-align: left;
+        }
+        
+        thead {
+            position: sticky;
+            top: 0;
+            background-color: #1e293b;
+            color: #ffffff;
+            z-index: 1;
+        }
+        
+        th { padding: 14px 16px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; font-size: 12px;}
+        td { padding: 14px 16px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+        tr:nth-child(even) { background-color: #f8fafc; }
+        tr:hover { background-color: #f1f5f9; }
+        
+        .rank { font-weight: 700; color: #94a3b8; }
+        .company { font-weight: 700; color: #2563eb; font-size: 14px;}
+        .stipend { font-weight: 600; color: #059669; }
+        .window { font-weight: 600; color: #ea580c; }
+        
+        .apply-btn {
+            display: inline-block;
+            background-color: #2563eb;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 12px;
+            transition: background-color 0.2s;
+        }
+        
+        .apply-btn:hover { background-color: #1d4ed8; }
+
+        .footer-credit {
+            text-align: center;
+            margin-top: 30px;
+            padding-bottom: 10px;
+            color: #475569;
+            font-size: 15px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>Top 100 SDE & Web Dev Off-Campus Tracker</h1>
+        <p>FAANG, Top MNCs & Unicorns (With Application Links)</p>
+    </div>
+
+    <div class="search-container">
+        <input type="text" id="searchInput" placeholder="Search company, location, or role..." onkeyup="filterTable()">
+        <div style="font-size: 14px; font-weight: 600; color: #64748b;" id="countDisplay"></div>
+    </div>
+
+    <div class="table-wrapper">
+        <table id="companyTable">
+            <thead>
+                <tr>
+                    <th style="width: 5%;">#</th>
+                    <th style="width: 18%;">Company</th>
+                    <th style="width: 15%;">App Window</th>
+                    <th style="width: 18%;">Role</th>
+                    <th style="width: 20%;">Stipend / CTC</th>
+                    <th style="width: 14%;">Location</th>
+                    <th style="width: 10%;">Apply Link</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                <!-- Data will be populated here -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="footer-credit">
+    Created by Ankit Kumar
+</div>
+
+<script>
+    // 100 Companies Data with Careers URLs
+    const companyData = [
+        ["Google", "July - Sept", "SDE Intern", "₹1.0L-1.2L/mo", "Bangalore/Hyd", "https://careers.google.com/students/"],
+        ["Microsoft", "July - Sept", "SWE Intern", "₹1.0L/mo", "Hyderabad/Blr", "https://careers.microsoft.com/students/us/en"],
+        ["Amazon", "Aug - Oct", "SDE Intern", "₹1.1L/mo", "Bangalore/Hyd", "https://www.amazon.jobs/en/business_categories/student-programs"],
+        ["Apple", "July - Aug", "Software Intern", "₹1.2L/mo", "Hyderabad", "https://jobs.apple.com/en-in/details/students"],
+        ["Meta", "Global/Remote", "SWE Intern", "Var (High)", "Remote", "https://www.metacareers.com/students/"],
+        ["Netflix", "Sept - Nov", "SWE Intern", "₹1.5L/mo", "Mumbai/Remote", "https://jobs.netflix.com/"],
+        ["Uber", "July - Sept", "SWE Intern", "₹1.5L/mo", "Bangalore", "https://www.uber.com/in/en/careers/"],
+        ["Atlassian", "Aug - Sept", "SWE Intern", "₹1.2L/mo", "Bangalore", "https://www.atlassian.com/company/careers/students"],
+        ["LinkedIn", "Aug - Oct", "SWE Intern", "₹1.2L/mo", "Bangalore", "https://careers.linkedin.com/students"],
+        ["Adobe", "Aug - Sept", "CS Intern", "₹1.0L/mo", "Noida/Blr", "https://careers.adobe.com/us/en/university"],
+        ["Salesforce", "July - Sept", "SWE Intern", "₹90K/mo", "Hyderabad/Blr", "https://www.salesforce.com/company/careers/university-recruiting/"],
+        ["Intuit", "July - Sept", "SWE Intern", "₹80K-1.0L/mo", "Bangalore", "https://jobs.intuit.com/student-programs"],
+        ["Tower Research", "July - Aug", "SWE Intern", "₹1.5L-2.0L/mo", "Gurgaon", "https://www.tower-research.com/careers"],
+        ["D. E. Shaw", "Aug - Oct", "SWE Intern", "₹1.5L/mo", "Hyderabad", "https://www.deshaw.com/careers"],
+        ["Goldman Sachs", "July - Sept", "SDE Analyst", "₹1.0L/mo", "Bangalore/Hyd", "https://www.goldmansachs.com/careers/students/"],
+        ["Morgan Stanley", "July - Sept", "Tech Analyst", "₹87K/mo", "Mumbai/Blr", "https://www.morganstanley.com/people/students-and-graduates"],
+        ["Cisco", "Aug - Oct", "Tech Intern", "₹70K-90K/mo", "Bangalore", "https://jobs.cisco.com/jobs/SearchJobs"],
+        ["Oracle", "Aug - Oct", "SWE Intern", "₹60K-80K/mo", "Bangalore/Hyd", "https://www.oracle.com/in/corporate/careers/students/"],
+        ["PayPal", "Aug - Oct", "SWE Intern", "₹80K-1.0L/mo", "Chennai/Blr", "https://careers.paypal.com/us/en/students"],
+        ["Twilio", "Sept - Nov", "SWE Intern", "₹90K/mo", "Bangalore", "https://www.twilio.com/company/jobs"],
+        ["ServiceNow", "Aug - Oct", "SWE Intern", "₹80K/mo", "Hyderabad", "https://careers.servicenow.com/students/"],
+        ["Nvidia", "July - Sept", "SWE Intern", "₹90K-1.1L/mo", "Pune/Blr", "https://www.nvidia.com/en-us/about-nvidia/careers/university-recruiting/"],
+        ["Walmart Global", "Aug - Oct", "SDE Intern", "₹80K/mo", "Bangalore", "https://careers.walmart.com/students-and-graduates"],
+        ["SAP Labs", "July - Sept", "Dev Intern", "₹40K-60K/mo", "Bangalore", "https://jobs.sap.com/"],
+        ["VMware", "Aug - Oct", "MTS Intern", "₹60K-80K/mo", "Bangalore", "https://careers.vmware.com/main/jobs"],
+        ["Target", "July - Sept", "Engineer Intern", "₹50K-70K/mo", "Bangalore", "https://corporate.target.com/careers/"],
+        ["Samsung SRI", "Aug - Oct", "SDE Intern", "₹50K/mo", "Delhi/Blr", "https://research.samsung.com/careers"],
+        ["Intel", "Year-round", "SWE Intern", "₹40K-60K/mo", "Bangalore", "https://jobs.intel.com/"],
+        ["AMD", "Year-round", "SWE Intern", "₹40K-60K/mo", "Hyderabad", "https://www.amd.com/en/corporate/careers.html"],
+        ["Qualcomm", "Aug - Oct", "SWE Intern", "₹50K-70K/mo", "Hyderabad", "https://qualcomm.wd5.myworkdayjobs.com/External"],
+        ["Texas Instruments", "Aug - Oct", "SWE Intern", "₹50K-70K/mo", "Bangalore", "https://careers.ti.com/students/"],
+        ["Rakuten", "Sept - Nov", "SDE Intern", "₹50K/mo", "Bangalore", "https://corp.rakuten.co.jp/careers/"],
+        ["Gojek", "Aug - Oct", "Product Intern", "₹80K/mo", "Bangalore", "https://www.gojek.io/careers"],
+        ["Grab", "Aug - Oct", "SWE Intern", "₹80K/mo", "Bangalore", "https://grab.careers/"],
+        ["Agoda", "Global", "SWE Intern", "Var", "Bangkok/Remote", "https://careersagoda.com/"],
+        ["Expedia", "July - Sept", "SDE Intern", "₹80K/mo", "Gurgaon", "https://careers.expediagroup.com/"],
+        ["Mastercard", "Aug - Oct", "SWE Intern", "₹60K/mo", "Pune/Gurgaon", "https://careers.mastercard.com/students"],
+        ["Visa", "Aug - Oct", "SWE Intern", "₹60K/mo", "Bangalore", "https://vi.sa/careers"],
+        ["American Express", "July - Sept", "Eng Intern", "₹70K/mo", "Gurgaon", "https://aexp.eightfold.ai/careers"],
+        ["JP Morgan", "July - Sept", "SWE Intern", "₹70K/mo", "Mumbai/Blr", "https://careers.jpmorgan.com/global/en/students"],
+        ["Flipkart", "Aug - Oct", "SDE Intern", "₹1.0L/mo", "Bangalore", "https://www.flipkartcareers.com/"],
+        ["Razorpay", "July - Sept", "SDE Intern", "₹60K-80K/mo", "Bangalore", "https://razorpay.com/jobs/"],
+        ["CRED", "Sept - Nov", "SDE Intern", "₹80K-1.0L/mo", "Bangalore", "https://careers.cred.club/"],
+        ["Dream11", "Aug - Oct", "SDE Intern", "₹80K/mo", "Mumbai", "https://about.dream11.in/careers"],
+        ["Postman", "Aug - Sept", "SWE Intern", "₹70K-90K/mo", "Bangalore", "https://www.postman.com/company/careers/"],
+        ["BrowserStack", "July - Sept", "SWE Intern", "₹60K-80K/mo", "Mumbai", "https://www.browserstack.com/careers"],
+        ["Zepto", "Aug - Oct", "SDE Intern", "₹60K-80K/mo", "Mumbai", "https://www.zeptonow.com/careers"],
+        ["Chargebee", "Sept - Oct", "SWE Intern", "₹50K-70K/mo", "Chennai", "https://www.chargebee.com/company/careers/"],
+        ["Groww", "Aug - Oct", "SDE Intern", "₹60K-80K/mo", "Bangalore", "https://groww.in/about-us/careers"],
+        ["PhonePe", "July - Sept", "SWE Intern", "₹80K-1.0L/mo", "Bangalore", "https://www.phonepe.com/careers/"],
+        ["Swiggy", "Aug - Oct", "SDE Intern", "₹60K-80K/mo", "Bangalore", "https://careers.swiggy.com/"],
+        ["Zomato", "Aug - Oct", "SDE Intern", "₹60K-80K/mo", "Gurgaon", "https://www.zomato.com/careers"],
+        ["ShareChat", "Sept - Nov", "SWE Intern", "₹70K-90K/mo", "Bangalore", "https://sharechat.com/about/careers"],
+        ["slice", "Aug - Oct", "SDE Intern", "₹60K-80K/mo", "Bangalore", "https://sliceit.com/careers"],
+        ["Meesho", "Sept - Oct", "SWE Intern", "₹60K-80K/mo", "Bangalore", "https://meesho.io/jobs"],
+        ["Myntra", "Aug - Oct", "SDE Intern", "₹60K-80K/mo", "Bangalore", "https://careers.myntra.com/"],
+        ["Lenskart", "Aug - Oct", "SDE Intern", "₹40K-60K/mo", "Delhi NCR", "https://hiring.lenskart.com/"],
+        ["Nykaa", "Sept - Nov", "SWE Intern", "₹40K-60K/mo", "Mumbai", "https://www.nykaa.com/careers"],
+        ["Urban Company", "Aug - Oct", "SDE Intern", "₹60K-80K/mo", "Gurgaon", "https://careers.urbancompany.com/"],
+        ["Cars24", "Sept - Oct", "SDE Intern", "₹50K-70K/mo", "Gurgaon", "https://www.cars24.com/careers/"],
+        ["PolicyBazaar", "Aug - Oct", "SWE Intern", "₹40K-60K/mo", "Gurgaon", "https://www.policybazaar.com/careers/"],
+        ["Unacademy", "Aug - Oct", "SWE Intern", "₹50K-70K/mo", "Bangalore", "https://unacademy.com/careers"],
+        ["Paytm", "Year-round", "SDE Intern", "₹30K-50K/mo", "Noida", "https://paytm.com/careers"],
+        ["Freshworks", "Aug - Oct", "SWE Intern", "₹40K-60K/mo", "Chennai", "https://www.freshworks.com/company/careers/"],
+        ["Zoho", "Year-round", "SDE Intern", "₹20K-40K/mo", "Chennai", "https://www.zoho.com/careers/"],
+        ["Ola", "Aug - Oct", "SDE Intern", "₹50K-70K/mo", "Bangalore", "https://ola.recruitee.com/"],
+        ["Udaan", "Sept - Nov", "SWE Intern", "₹50K-70K/mo", "Bangalore", "https://careers.udaan.com/"],
+        ["Delhivery", "Aug - Oct", "SDE Intern", "₹40K-60K/mo", "Gurgaon", "https://www.delhivery.com/careers/"],
+        ["Blinkit", "Aug - Oct", "SDE Intern", "₹50K-70K/mo", "Gurgaon", "https://blinkit.com/careers"],
+        ["Sprinklr", "Aug - Oct", "Eng Intern", "₹1.0L/mo", "Gurgaon", "https://www.sprinklr.com/careers/"],
+        ["Paytm Money", "Year-round", "SDE Intern", "₹40K/mo", "Bangalore", "https://www.paytmmoney.com/careers"],
+        ["Navi", "Aug - Oct", "SDE Intern", "₹60K-80K/mo", "Bangalore", "https://navi.com/careers"],
+        ["Jupiter", "Sept - Nov", "SDE Intern", "₹60K-80K/mo", "Bangalore", "https://jupiter.money/careers/"],
+        ["Fi Money", "Sept - Nov", "SDE Intern", "₹60K-80K/mo", "Bangalore", "https://fi.money/careers"],
+        ["Pine Labs", "Aug - Oct", "SWE Intern", "₹40K/mo", "Noida", "https://www.pinelabs.com/careers"],
+        ["BharatPe", "Aug - Oct", "SDE Intern", "₹50K-70K/mo", "Delhi", "https://bharatpe.com/careers"],
+        ["CoinSwitch", "Sept - Nov", "SDE Intern", "₹60K/mo", "Bangalore", "https://coinswitch.co/careers/"],
+        ["CoinDCX", "Sept - Nov", "SDE Intern", "₹60K/mo", "Mumbai", "https://coindcx.com/careers"],
+        ["Zeta", "Aug - Oct", "SDE Intern", "₹60K-80K/mo", "Bangalore", "https://www.zeta.tech/careers/"],
+        ["ClearTax", "Aug - Oct", "SWE Intern", "₹50K-70K/mo", "Bangalore", "https://clear.in/careers"],
+        ["Upstox", "Sept - Nov", "SDE Intern", "₹50K-70K/mo", "Mumbai", "https://upstox.com/careers/"],
+        ["Zerodha", "Year-round", "Tech Intern", "Tech Based", "Bangalore", "https://zerodha.com/careers"],
+        ["M2P Fintech", "Aug - Oct", "SDE Intern", "₹40K/mo", "Chennai", "https://m2pfintech.com/careers/"],
+        ["Setu", "Year-round", "SWE Intern", "₹50K/mo", "Bangalore", "https://setu.co/careers/"],
+        ["Cashfree", "Aug - Oct", "SDE Intern", "₹50K-70K/mo", "Bangalore", "https://www.cashfree.com/careers/"],
+        ["InMobi", "Aug - Oct", "SDE Intern", "₹60K-80K/mo", "Bangalore", "https://www.inmobi.com/company/careers"],
+        ["Glance", "Aug - Oct", "SDE Intern", "₹60K-80K/mo", "Bangalore", "https://glance.com/careers"],
+        ["MindTickle", "Sept - Nov", "SWE Intern", "₹50K-70K/mo", "Pune", "https://www.mindtickle.com/careers/"],
+        ["Eightfold.ai", "Aug - Oct", "SWE Intern", "₹80K-1.0L/mo", "Noida", "https://eightfold.ai/about/careers/"],
+        ["Innovaccer", "Aug - Oct", "SDE Intern", "₹60K-80K/mo", "Noida", "https://innovaccer.com/careers"],
+        ["Darwinbox", "Sept - Nov", "SDE Intern", "₹40K-60K/mo", "Hyderabad", "https://darwinbox.com/careers"],
+        ["MoEngage", "Aug - Oct", "SWE Intern", "₹40K-60K/mo", "Bangalore", "https://www.moengage.com/careers/"],
+        ["Hasura", "Year-round", "SWE Intern", "₹80K/mo", "Remote", "https://hasura.io/careers"],
+        ["Vymo", "Sept - Nov", "SDE Intern", "₹50K-70K/mo", "Bangalore", "https://www.vymo.com/careers"],
+        ["Icertis", "Aug - Oct", "SWE Intern", "₹40K/mo", "Pune", "https://www.icertis.com/company/careers/"],
+        ["HighRadius", "Aug - Oct", "SDE Intern", "₹40K/mo", "Hyderabad", "https://www.highradius.com/about/careers/"],
+        ["Druva", "Sept - Nov", "SWE Intern", "₹50K/mo", "Pune", "https://www.druva.com/about/careers"],
+        ["Dailyhunt", "Year-round", "SDE Intern", "₹40K/mo", "Bangalore", "https://verse.in/careers.html"],
+        ["Inshorts", "Year-round", "SWE Intern", "₹40K-60K/mo", "Noida", "https://inshorts.com/careers"],
+        ["WinZO", "Sept - Nov", "SDE Intern", "₹50K-70K/mo", "Delhi", "https://www.winzogames.com/careers"]
+    ];
+
+    const tableBody = document.getElementById("tableBody");
+    const countDisplay = document.getElementById("countDisplay");
+
+    function renderTable(data) {
+        tableBody.innerHTML = "";
+        data.forEach((company, index) => {
+            const row = `<tr>
+                <td class="rank">${index + 1}</td>
+                <td class="company">${company[0]}</td>
+                <td class="window">${company[1]}</td>
+                <td>${company[2]}</td>
+                <td class="stipend">${company[3]}</td>
+                <td>${company[4]}</td>
+                <td><a href="${company[5]}" target="_blank" class="apply-btn">Apply Now</a></td>
+            </tr>`;
+            tableBody.innerHTML += row;
+        });
+        countDisplay.innerText = `Showing ${data.length} Companies`;
+    }
+
+    function filterTable() {
+        const query = document.getElementById("searchInput").value.toLowerCase();
+        const filteredData = companyData.filter(c => 
+            c[0].toLowerCase().includes(query) || 
+            c[4].toLowerCase().includes(query) ||
+            c[2].toLowerCase().includes(query)
+        );
+        renderTable(filteredData);
+    }
+
+    renderTable(companyData);
+</script>
+</body>
+</html>
